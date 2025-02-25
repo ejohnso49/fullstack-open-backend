@@ -25,7 +25,6 @@ app.get('/info', (request, response) => {
   const payload = `<p>Phonebook has info for ${length} people</p>` + `<p>${date}</p>`;
 
   response.send(payload);
-  response.end();
 });
 
 app.delete('/api/persons/:id', (request, response) => {
@@ -40,14 +39,32 @@ const genId = () => {
 };
 
 app.post('/api/persons', (request, response) => {
+  const body = request.body;
+  const newName = body.name;
+  const newNumber = body.number;
+
+  if (!newName || !newNumber) {
+    response
+      .status(400)
+      .json({error: `Name: ${newName} or Number: ${newNumber} missing`});
+      return;
+  }
+
+  if (phonebook.find(person => person.name === newName)) {
+    response
+      .status(409)
+      .json({error: 'Name must be unique'});
+      return;
+  }
+
   const id = genId();
 
   const newPerson = {...request.body, id};
   phonebook = phonebook.concat(newPerson);
-  response.status(201);
-  response.json(newPerson);
-  response.end();
-})
+  response
+    .status(201)
+    .json(newPerson);
+});
 
 const PORT = 3001;
 app.listen(PORT);
