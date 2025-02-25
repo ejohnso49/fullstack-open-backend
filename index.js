@@ -4,7 +4,10 @@ const express = require('express');
 
 app = express();
 app.use(express.json());
-app.use(morgan('tiny'));
+
+// :method :path :status :response_length - :response_time ms :request_body
+morgan.token('body', (req, res) => JSON.stringify(req.body));
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
 
 app.get('/api/persons', (request, response) => {
   response.json(phonebook);
