@@ -35,6 +35,20 @@ app.delete('/api/persons/:id', (request, response) => {
   response.status(204).end();
 });
 
+const genId = () => {
+  return String(Math.floor(Math.random() * Math.pow(2, 16)));
+};
+
+app.post('/api/persons', (request, response) => {
+  const id = genId();
+
+  const newPerson = {...request.body, id};
+  phonebook = phonebook.concat(newPerson);
+  response.status(201);
+  response.json(newPerson);
+  response.end();
+})
+
 const PORT = 3001;
 app.listen(PORT);
 console.log(`Server running on port ${PORT}`);
