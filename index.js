@@ -1,8 +1,10 @@
 let phonebook = require('./db.json');
+const morgan = require('morgan');
 const express = require('express');
 
 app = express();
 app.use(express.json());
+app.use(morgan('tiny'));
 
 app.get('/api/persons', (request, response) => {
   response.json(phonebook);
