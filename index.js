@@ -8,6 +8,16 @@ app.get('/api/persons', (request, response) => {
   response.json(phonebook);
 });
 
+app.get('/api/persons/:id', (request, response) => {
+  const person = phonebook.find(value => value.id === request.params.id);
+  if (person === undefined) {
+    response.status(404).end();
+    return;
+  }
+
+  response.json(person);
+});
+
 app.get('/info', (request, response) => {
   const date = new Date().toUTCString();
   const length = phonebook.length;
