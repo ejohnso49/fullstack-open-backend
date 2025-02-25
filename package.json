@@ -1,0 +1,24 @@
+{
+  "name": "fullstack-open-backend",
+  "version": "1.0.0",
+  "description": "A simple backend for Fullstack Open course",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ejohnso49/fullstack-open-backend.git"
+  },
+  "author": "Eric Johnson",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/ejohnso49/fullstack-open-backend/issues"
+  },
+  "homepage": "https://github.com/ejohnso49/fullstack-open-backend#readme",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
