@@ -1,9 +1,11 @@
 let phonebook = require('./db.json');
 const morgan = require('morgan');
 const express = require('express');
+const cors = require('cors');
 
 app = express();
 app.use(express.json());
+app.use(cors());
 
 // :method :path :status :response_length - :response_time ms :request_body
 morgan.token('body', (req, res) => JSON.stringify(req.body));
