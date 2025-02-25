@@ -1,4 +1,4 @@
-const phonebook = require('./db.json');
+let phonebook = require('./db.json');
 const express = require('express');
 
 app = express();
@@ -26,6 +26,13 @@ app.get('/info', (request, response) => {
 
   response.send(payload);
   response.end();
+});
+
+app.delete('/api/persons/:id', (request, response) => {
+  const id = request.params.id;
+
+  phonebook = phonebook.filter(person => person.id !== id);
+  response.status(204).end();
 });
 
 const PORT = 3001;
