@@ -68,13 +68,29 @@ app.post('/api/persons', (request, response, next) => {
       return;
   }
 
-  const person = new Person({
-    name: newName,
-    number: newNumber,
-  });
+  Person.create({ name: newName, number: newNumber })
+    .then(person => {
+      response.json(person);
+    })
+    .catch(error => next(error));
+});
 
-  person.save()
-    .then(result => response.json(result))
+app.put('/api/persons/:id', (request, response, next) => {
+  const body = request.body;
+  const name = body.name;
+  const newNumber = body.number;
+
+  if (!name || !newNumber) {
+    response
+      .status(400)
+      .json({ error: `Name: ${name} or Number: ${newNumber} missing` });
+      return;
+  }
+
+  Person.findOneAndUpdate({ name: name }, { number: newNumber }, { new: true })
+    .then(person => {
+      response.json(person);
+    })
     .catch(error => next(error));
 });
 
