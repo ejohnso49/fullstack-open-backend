@@ -38,10 +38,6 @@ app.delete('/api/persons/:id', (request, response) => {
   response.status(204).end();
 });
 
-const genId = () => {
-  return String(Math.floor(Math.random() * Math.pow(2, 16)));
-};
-
 app.post('/api/persons', (request, response) => {
   const body = request.body;
   const newName = body.name;
@@ -54,20 +50,12 @@ app.post('/api/persons', (request, response) => {
       return;
   }
 
-  if (phonebook.find(person => person.name === newName)) {
-    response
-      .status(409)
-      .json({error: 'Name must be unique'});
-      return;
-  }
+  const person = new Person({
+    name: newName,
+    number: newNumber,
+  });
 
-  const id = genId();
-
-  const newPerson = {...request.body, id};
-  phonebook = phonebook.concat(newPerson);
-  response
-    .status(201)
-    .json(newPerson);
+  person.save().then(result => response.json(result));
 });
 
 const PORT = 3001;
