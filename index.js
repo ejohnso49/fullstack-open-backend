@@ -1,4 +1,4 @@
-let phonebook = require('./db.json');
+
 const morgan = require('morgan');
 const express = require('express');
 const cors = require('cors');
@@ -13,32 +13,50 @@ app.use(express.static('dist'));
 morgan.token('body', (req, res) => JSON.stringify(req.body));
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
 
-app.get('/api/persons', (request, response) => {
-  Person.find({}).then(people => response.json(people));
+app.get('/api/persons', (request, response, next) => {
+  Person.find({})
+    .then(people => response.json(people))
+    .catch(error => next(error));
 });
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
   const id = request.params.id;
-  Person.findById(id).then(person => response.json(person));
+  Person.findById(id)
+    .then(person => {
+      if (person) {
+        response.json(person)
+      } else {
+        response.status(404).json({ error: `Person with id[${id}] not found` });
+      }
+    })
+    .catch(error => next(error));
 });
 
-app.get('/info', (request, response) => {
+app.get('/info', (request, response, next) => {
   const date = new Date().toUTCString();
-  const length = phonebook.length;
-
-  const payload = `<p>Phonebook has info for ${length} people</p>` + `<p>${date}</p>`;
-
-  response.send(payload);
+  Person.estimatedDocumentCount({})
+    .then(count => {
+      const payload = `<p>Phonebook has info for ${count} people</p>` + `<p>${date}</p>`;
+      response.send(payload);
+    })
+    .catch(error => next(error));
 });
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
   const id = request.params.id;
 
-  phonebook = phonebook.filter(person => person.id !== id);
-  response.status(204).end();
+  Person.findByIdAndDelete(id)
+    .then(result => {
+      if (result) {
+        response.status(204).end();
+      } else {
+        response.status(404).json({ error: `Person with id[${id}] not found` });
+      }
+    })
+    .catch(error => next(error));
 });
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
   const body = request.body;
   const newName = body.name;
   const newNumber = body.number;
@@ -55,8 +73,21 @@ app.post('/api/persons', (request, response) => {
     number: newNumber,
   });
 
-  person.save().then(result => response.json(result));
+  person.save()
+    .then(result => response.json(result))
+    .catch(error => next(error));
 });
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformed id' });
+  }
+
+  next(error);
+}
+app.use(errorHandler);
 
 const PORT = 3001;
 app.listen(PORT);
