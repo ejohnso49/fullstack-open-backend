@@ -2,6 +2,7 @@ let phonebook = require('./db.json');
 const morgan = require('morgan');
 const express = require('express');
 const cors = require('cors');
+const Person = require('./models/person');
 
 app = express();
 app.use(express.json());
@@ -13,17 +14,12 @@ morgan.token('body', (req, res) => JSON.stringify(req.body));
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
 
 app.get('/api/persons', (request, response) => {
-  response.json(phonebook);
+  Person.find({}).then(people => response.json(people));
 });
 
 app.get('/api/persons/:id', (request, response) => {
-  const person = phonebook.find(value => value.id === request.params.id);
-  if (person === undefined) {
-    response.status(404).end();
-    return;
-  }
-
-  response.json(person);
+  const id = request.params.id;
+  Person.findById(id).then(person => response.json(person));
 });
 
 app.get('/info', (request, response) => {
