@@ -12,9 +12,27 @@ mongoose.connect(url)
     console.log('error connectiong to MongoDB:', error.message);
   });
 
+const validatorMessage = (props) => {
+  return `${props.path} = ${props.value}, does not conform to xx-xxxxxx+ or xxx-xxxxx+`
+};
+
 const personSchema = new mongoose.Schema({
-  name: String,
-  number: String,
+  name: {
+    type: String,
+    minLength: 3,
+    required: true,
+  },
+  number: {
+    type: String,
+    minLength: 8,
+    required: true,
+    validate: {
+      validator: (v) => {
+        return /^\d{2,3}-\d+$/.test(v);
+      },
+      message: validatorMessage,
+    },
+  },
 });
 personSchema.set('toJSON', {
   transform: (document, returnedObject) => {
