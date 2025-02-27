@@ -4,13 +4,13 @@ const express = require('express');
 const cors = require('cors');
 const Person = require('./models/person');
 
-app = express();
+const app = express();
 app.use(express.json());
 app.use(cors());
 app.use(express.static('dist'));
 
 // :method :path :status :response_length - :response_time ms :request_body
-morgan.token('body', (req, res) => JSON.stringify(req.body));
+morgan.token('body', (req) => JSON.stringify(req.body));
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
 
 app.get('/api/persons', (request, response, next) => {
@@ -64,8 +64,8 @@ app.post('/api/persons', (request, response, next) => {
   if (!newName || !newNumber) {
     response
       .status(400)
-      .json({error: `Name: ${newName} or Number: ${newNumber} missing`});
-      return;
+      .json({ error: `Name: ${newName} or Number: ${newNumber} missing` });
+    return;
   }
 
   Person.create({ name: newName, number: newNumber })
@@ -84,7 +84,7 @@ app.put('/api/persons/:id', (request, response, next) => {
     response
       .status(400)
       .json({ error: `Name: ${name} or Number: ${newNumber} missing` });
-      return;
+    return;
   }
 
   Person.findOneAndUpdate({ name: name }, { number: newNumber }, { new: true, runValidators: true, context: 'query' })

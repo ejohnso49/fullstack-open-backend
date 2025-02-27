@@ -7,7 +7,7 @@ const addNewPerson = (name, number) => {
     number: number,
   });
 
-  person.save().then(result => {
+  person.save().then(() => {
     console.log('saved person');
     mongoose.connection.close();
   });
@@ -42,7 +42,7 @@ if (process.argv.length >= 4) {
   const number = process.argv[3];
 
   addNewPerson(name, number);
-} else if (process.argv.length == 2) {
+} else if (process.argv.length === 2) {
   printPhonebook();
 } else {
   console.log('Wrong number of args. Either call with none or :name :number');
