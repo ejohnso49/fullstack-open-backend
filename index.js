@@ -1,30 +1,29 @@
-
-const morgan = require('morgan');
-const express = require('express');
-const cors = require('cors');
-const Person = require('./models/person');
+const morgan = require("morgan");
+const express = require("express");
+const cors = require("cors");
+const Person = require("./models/person");
 
 const app = express();
 app.use(express.json());
 app.use(cors());
-app.use(express.static('dist'));
+app.use(express.static("dist"));
 
 // :method :path :status :response_length - :response_time ms :request_body
-morgan.token('body', (req) => JSON.stringify(req.body));
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
+morgan.token("body", req => JSON.stringify(req.body));
+app.use(morgan(":method :url :status :res[content-length] - :response-time ms :body"));
 
-app.get('/api/persons', (request, response, next) => {
+app.get("/api/persons", (request, response, next) => {
   Person.find({})
     .then(people => response.json(people))
     .catch(error => next(error));
 });
 
-app.get('/api/persons/:id', (request, response, next) => {
+app.get("/api/persons/:id", (request, response, next) => {
   const id = request.params.id;
   Person.findById(id)
-    .then(person => {
+    .then((person) => {
       if (person) {
-        response.json(person)
+        response.json(person);
       } else {
         response.status(404).json({ error: `Person with id[${id}] not found` });
       }
@@ -32,21 +31,21 @@ app.get('/api/persons/:id', (request, response, next) => {
     .catch(error => next(error));
 });
 
-app.get('/info', (request, response, next) => {
+app.get("/info", (request, response, next) => {
   const date = new Date().toUTCString();
   Person.estimatedDocumentCount({})
-    .then(count => {
+    .then((count) => {
       const payload = `<p>Phonebook has info for ${count} people</p>` + `<p>${date}</p>`;
       response.send(payload);
     })
     .catch(error => next(error));
 });
 
-app.delete('/api/persons/:id', (request, response, next) => {
+app.delete("/api/persons/:id", (request, response, next) => {
   const id = request.params.id;
 
   Person.findByIdAndDelete(id)
-    .then(result => {
+    .then((result) => {
       if (result) {
         response.status(204).end();
       } else {
@@ -56,7 +55,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
     .catch(error => next(error));
 });
 
-app.post('/api/persons', (request, response, next) => {
+app.post("/api/persons", (request, response, next) => {
   const body = request.body;
   const newName = body.name;
   const newNumber = body.number;
@@ -69,13 +68,13 @@ app.post('/api/persons', (request, response, next) => {
   }
 
   Person.create({ name: newName, number: newNumber })
-    .then(person => {
+    .then((person) => {
       response.json(person);
     })
     .catch(error => next(error));
 });
 
-app.put('/api/persons/:id', (request, response, next) => {
+app.put("/api/persons/:id", (request, response, next) => {
   const body = request.body;
   const name = body.name;
   const newNumber = body.number;
@@ -87,8 +86,8 @@ app.put('/api/persons/:id', (request, response, next) => {
     return;
   }
 
-  Person.findOneAndUpdate({ name: name }, { number: newNumber }, { new: true, runValidators: true, context: 'query' })
-    .then(person => {
+  Person.findOneAndUpdate({ name: name }, { number: newNumber }, { new: true, runValidators: true, context: "query" })
+    .then((person) => {
       response.json(person);
     })
     .catch(error => next(error));
@@ -97,14 +96,14 @@ app.put('/api/persons/:id', (request, response, next) => {
 const errorHandler = (error, request, response, next) => {
   console.error(error.message);
 
-  if (error.name === 'CastError') {
-    return response.status(400).json({ error: 'malformed id' });
-  } else if (error.name === 'ValidationError') {
+  if (error.name === "CastError") {
+    return response.status(400).json({ error: "malformed id" });
+  } else if (error.name === "ValidationError") {
     return response.status(400).json({ error: error.message });
   }
 
   next(error);
-}
+};
 app.use(errorHandler);
 
 const PORT = 3001;

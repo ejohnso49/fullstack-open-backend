@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-require('dotenv').config();
+const mongoose = require("mongoose");
+require("dotenv").config();
 
 const addNewPerson = (name, number) => {
   const person = new Person({
@@ -8,25 +8,25 @@ const addNewPerson = (name, number) => {
   });
 
   person.save().then(() => {
-    console.log('saved person');
+    console.log("saved person");
     mongoose.connection.close();
   });
 };
 
 const printPhonebook = () => {
-  Person.find({}).then(result => {
+  Person.find({}).then((result) => {
     result.forEach(person => console.log(person));
     mongoose.connection.close();
   });
 };
 
 if (process.env.MONGODB_CONNECTION_STRING === undefined) {
-  console.log('Missing connection string definition in .env');
+  console.log("Missing connection string definition in .env");
   process.exit(1);
 }
 
 const url = process.env.MONGODB_CONNECTION_STRING;
-mongoose.set('strictQuery', false);
+mongoose.set("strictQuery", false);
 mongoose.connect(url);
 
 const personSchema = new mongoose.Schema({
@@ -34,7 +34,7 @@ const personSchema = new mongoose.Schema({
   number: String,
 });
 
-const Person = new mongoose.model('Person', personSchema);
+const Person = new mongoose.model("Person", personSchema);
 
 // First arg is process.execPath, second is path to mongo.js, third is first arg if present
 if (process.argv.length >= 4) {
@@ -45,9 +45,6 @@ if (process.argv.length >= 4) {
 } else if (process.argv.length === 2) {
   printPhonebook();
 } else {
-  console.log('Wrong number of args. Either call with none or :name :number');
+  console.log("Wrong number of args. Either call with none or :name :number");
   process.exit(1);
 }
-
-
-
